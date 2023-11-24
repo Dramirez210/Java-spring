@@ -2,16 +2,13 @@ package mx.edu.uacm.app.models.dao;
 
 import java.util.List;
 
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
 import mx.edu.uacm.app.models.entity.Cliente;
 
-public interface IClienteDao {
+public interface IClienteDao extends PagingAndSortingRepository<Cliente, Long>, CrudRepository<Cliente, Long> {
 
-	public Cliente findOne(Long id);
 	
-	public List<Cliente> findAll();
-	
-	public void save(Cliente cliente);
-	
-	public void delete(Long id);
 	
 }
