@@ -1,5 +1,9 @@
 package mx.edu.uacm.app.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +13,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
@@ -28,6 +34,19 @@ public class ClienteController {
 
 	@Autowired
 	private IClienteService clienteService;
+	
+	@GetMapping(value="/ver/{id}")
+	public String ver(@PathVariable(value="id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+		Cliente cliente = clienteService.findOne(id);
+		if(cliente==null) {
+			flash.addFlashAttribute("error", "El cliente no existe");
+			return "redirect:/listar";
+		}
+		model.put("cliente", cliente);
+		model.put("titulo", "Detalle cliente: " + cliente.getNombre());
+		
+		return "ver";
+	}
 	
 	
 	@RequestMapping(value="/listar", method = RequestMethod.GET)
@@ -50,6 +69,7 @@ public class ClienteController {
 		Cliente cliente = new Cliente();
 		model.put("titulo", "Formulario Cliente");
 		model.put("cliente", cliente);
+		model.put("btnText", "Crear cliente");
 		return "form";
 	}
 	
@@ -67,19 +87,37 @@ public class ClienteController {
 			return "redirect:/listar";
 		}
 		
-		model.put("titulo", "Formulario Editar - Cliente");
 		model.put("cliente", cliente);
+		model.put("titulo", "Formulario Editar - Cliente");
+		model.put("btnText", "Editar Cliente");
 		
 		return "form";
 	}
 	
 	@RequestMapping(value = "/form", method = RequestMethod.POST)
-	public String guardar(@Valid Cliente cliente, BindingResult result, Model model, RedirectAttributes flash,  SessionStatus status) {
+	public String guardar(@Valid Cliente cliente, BindingResult result, Model model,
+			@RequestParam("file") MultipartFile foto, RedirectAttributes flash,  SessionStatus status) {
 		// Validar cliente primero va @Valid y en result guardara los errores en caso de que existan
 		if(result.hasErrors()) {
 			model.addAttribute("titulo", "El formulario tiene errores");
 			return "form";
 		}
+		if(!foto.isEmpty()) {
+			// Path directorioRecursos = Paths.get("src//main//resources//static/uploads"); // carpeta interna dentro del proyecto
+			//String rootPath = directorioRecursos.toFile().getAbsolutePath();
+			String rootPath = "C://Temp//uploads";
+			try {
+				byte[] bytes = foto.getBytes();
+				Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
+				Files.write(rutaCompleta, bytes);
+				flash.addFlashAttribute("info", "Carga completada '" + foto.getOriginalFilename() + "'");
+				
+				cliente.setFoto(foto.getOriginalFilename());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con exito!" : "Cliente creado con exito!";
 		clienteService.save(cliente);
 		status.setComplete();

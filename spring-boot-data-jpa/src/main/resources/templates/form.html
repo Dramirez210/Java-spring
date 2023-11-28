@@ -15,9 +15,9 @@
 						<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
 					</ul>
 				</div>
-				<form th:action="@{/form}" th:object="${cliente}" method="post">
+				<form th:action="@{/form}" th:object="${cliente}" method="post" enctype="multipart/form-data"> <!-- upload-->
 					<div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Nombre</label>
+						<label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
 						<div class="col-sm-6">
 							<input type="text" th:field="*{nombre}" class="form-control"
 								th:errorclass="'form-control alert alert-danger'" />
@@ -27,7 +27,7 @@
 						</div>
 					</div>
 					<div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Apellido</label>
+						<label for="apellido" class="col-sm-2 col-form-label">Apellido</label>
 
 						<div class="col-sm-6">
 							<input type="text" th:field="*{apellido}" class="form-control"
@@ -37,7 +37,7 @@
 						</div>
 					</div>
 					<div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Email</label>
+						<label for="email" class="col-sm-2 col-form-label">Email</label>
 						<div class="col-sm-6">
 							<input type="text" th:field="*{email}" class="form-control"
 								th:errorclass="'form-control alert alert-danger'" />
@@ -46,7 +46,7 @@
 						</div>
 					</div>
 					<div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Fecha</label>
+						<label for="fecha" class="col-sm-2 col-form-label">Fecha</label>
 						<div class="col-sm-6">
 							<input type="text" th:field="*{createAt}" class="form-control"
 								th:errorclass="'form-control alert alert-danger'" />
@@ -55,8 +55,16 @@
 						</div>
 					</div>
 					<div class="mb-3 row">
+						<label for="file" class="col-sm-2 col-form-label">Foto</label>
 						<div class="col-sm-6">
-							<input type="submit" value="Crear Cliente" class="btn btn-primary" />
+							<!-- <input type="file" name="file" th:field="*{foto}" class="form-control"
+								th:errorclass="'form-control alert alert-danger'" /> -->
+								<input type="file" name="file" class="form-control" />
+						</div>
+					</div>
+					<div class="mb-3 row">
+						<div class="col-sm-6">
+							<input type="submit" th:value="${btnText}" class="btn btn-primary" />
 						</div>
 					</div>
 					<!--<input type="hidden" th:field="*{id}" />-->
