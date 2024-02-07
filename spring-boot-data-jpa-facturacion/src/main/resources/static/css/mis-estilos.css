@@ -1,0 +1,12 @@
+
+.input-link {
+  
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.input-link:hover,
+.input-link:focus {
+  color: black;
+}
+
